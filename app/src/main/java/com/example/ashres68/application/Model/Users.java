@@ -3,8 +3,7 @@ package com.example.ashres68.application.Model;
 public class Users {
     private String name, phone, password, image, address;
 
-    public Users()
-    {
+    public Users() {
 
     }
 
@@ -15,7 +14,6 @@ public class Users {
         this.image = image;
         this.address = address;
     }
-
 
     public String getName() {
         return name;
@@ -57,3 +55,5 @@ public class Users {
         this.address = address;
     }
 }
+
+
