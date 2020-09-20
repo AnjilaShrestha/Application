@@ -1,5 +1,4 @@
 package com.example.ashres68.application;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -24,9 +24,12 @@ import com.example.ashres68.application.Prevalent.Prevalent;
 import com.example.ashres68.application.ViewHolder.ProductViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.github.azygous13.rateapp.RateApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.rey.material.widget.ImageView;
+import com.rey.material.widget.RelativeLayout;
 import com.rey.material.widget.TextView;
 import com.squareup.picasso.Picasso;
 
@@ -36,13 +39,23 @@ import io.paperdb.Paper;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private DatabaseReference ProductsRef;
+    private Query query;
     private RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        RateApp.init()
+                .setDebug(true) // default false
+                .useUntilPrompt(5) // default 10
+                .dayUntilPrompt(3) // default 7
+                .cancelable(true) // default false
+                .setShowIcon(true) // default true
+                .monitor(MainActivity.this);
         ProductsRef = FirebaseDatabase.getInstance().getReference().child("Products");
+        query = ProductsRef.orderByChild("pname");
+
         Paper.init(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -84,16 +97,11 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(layoutManager);
     }
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-
+    private void call_firebase_database(Query query) {
         FirebaseRecyclerOptions<Products> options =
                 new FirebaseRecyclerOptions.Builder<Products>()
-                        .setQuery(ProductsRef, Products.class)
+                        .setQuery(query, Products.class)
                         .build();
-
 
         FirebaseRecyclerAdapter<Products, ProductViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Products, ProductViewHolder>(options) {
@@ -109,14 +117,11 @@ public class MainActivity extends AppCompatActivity
                             @Override
                             public void onClick(View view)
                             {
-                                    Intent intent = new Intent(MainActivity.this, ProductDetailsActivity.class);
-                                    intent.putExtra("pid", model.getPid());
-                                    startActivity(intent);
+                                Intent intent = new Intent(MainActivity.this, ProductDetailsActivity.class);
+                                intent.putExtra("pid", model.getPid());
+                                startActivity(intent);
                             }
                         });
-
-
-
                     }
 
                     @NonNull
@@ -132,6 +137,11 @@ public class MainActivity extends AppCompatActivity
         adapter.startListening();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        call_firebase_database(query);
+    }
 
     @Override
     public void onBackPressed() {
@@ -145,21 +155,39 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.id_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint("Search by Name");
+        searchView.setIconified(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                if(s.isEmpty()) call_firebase_database(query);
+                else call_firebase_database(query.equalTo(s));
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if(s.isEmpty()) call_firebase_database(query);
+                else call_firebase_database(query.equalTo(s));
+                return false;
+            }
+        });
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-
-
+        switch (item.getItemId()){
+            case R.id.id_high:
+                call_firebase_database(ProductsRef.orderByChild("price").limitToFirst(1000));
+                break;
+            case R.id.id_low:
+                call_firebase_database(ProductsRef.orderByChild("pname").limitToLast(1000));
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -175,9 +203,10 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        } else if (id == R.id.nav_orders) {
+        } else if (id == R.id.help) {
+            Intent intent = new Intent(MainActivity.this, Help.class);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_categories) {
 
         }
 
@@ -200,4 +229,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
 }

@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Help"></activity>
         <activity
             android:name=".Main3Activity"
             android:label="@string/app_name"
@@ -31,7 +32,7 @@
         <activity android:name=".AdminCategoryActivity" />
         <activity android:name=".ProductDetailsActivity" />
         <activity android:name=".CartActivity" />
-        <activity android:name=".ConfirmFinalOrderActivity"></activity>
+        <activity android:name=".ConfirmFinalOrderActivity" />
     </application>
 
 </manifest>

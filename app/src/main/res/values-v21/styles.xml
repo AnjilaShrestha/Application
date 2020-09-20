@@ -4,5 +4,12 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:actionOverflowButtonStyle">@style/filter_btn</item>
+    </style>
+
+    <style name="filter_btn" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_filter</item>
+        <item name="android:background">?android:attr/actionBarItemBackground</item>
+        <item name="android:contentDescription">Filter</item>
     </style>
 </resources>
