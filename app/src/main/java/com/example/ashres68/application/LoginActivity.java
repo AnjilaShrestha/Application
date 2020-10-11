@@ -24,7 +24,7 @@ public class LoginActivity extends AppCompatActivity
 {
     private EditText InputPhoneNumber, InputPassword;
     private Button LoginButton;
-    private TextView AdminLink, NotAdminLink;
+    private TextView AdminLink, NotAdminLink, ForgetPasswordLink;
     private ProgressDialog loadingBar;
     private String parentDbName = "Users";
 
@@ -42,12 +42,22 @@ public class LoginActivity extends AppCompatActivity
         AdminLink = (TextView) findViewById(R.id.admin_panel_link);
         NotAdminLink = (TextView) findViewById(R.id.not_admin_panel_link);
         loadingBar = new ProgressDialog(this);
-
+        ForgetPasswordLink = findViewById(R.id.forget_password_link);
+        loadingBar = new ProgressDialog(this);
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {
                 LoginUser();
+            }
+        });
+        ForgetPasswordLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+                intent.putExtra("check", "login");
+                startActivity(intent);
             }
         });
         AdminLink.setOnClickListener(new View.OnClickListener() {

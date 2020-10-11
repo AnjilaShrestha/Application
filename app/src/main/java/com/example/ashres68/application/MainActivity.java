@@ -212,8 +212,8 @@ public class MainActivity extends AppCompatActivity
 
 
         else if (id == R.id.nav_settings) {
-            //Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-            //startActivity(intent);
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
 
         }
         else if (id == R.id.nav_logout) {
